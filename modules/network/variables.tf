@@ -9,7 +9,8 @@ variable "vpc_name" {
 }
 
 variable "network_name" {
-
+  description = "Name for the Guest Network"
+  type        = string
 }
 
 variable "network_cidr" {

@@ -1,5 +1,5 @@
 resource "cloudstack_network" "homelab_network" {
-  name             = "homelab-k8s-network"
+  name             = var.network_name
   cidr             = var.network_cidr
   network_offering = var.network_offering_name
   zone             = cloudstack_vpc.vpc_homelab.zone
