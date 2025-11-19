@@ -1,13 +1,13 @@
 module "network" {
-  source            = "./modules/network"
-  zone              = var.zone
-  vpc_cidr          = var.vpc_cidr
-  vpc_offering_name = var.vpc_offering
-  vpc_name          = var.vpc_name
-  network_name      = var.network_name
-  network_cidr      = var.network_cidr
+  source                = "./modules/network"
+  zone                  = var.zone
+  vpc_cidr              = var.vpc_cidr
+  vpc_offering_name     = var.vpc_offering
+  vpc_name              = var.vpc_name
+  network_name          = var.network_name
+  network_cidr          = var.network_cidr
   network_offering_name = var.network_offering_name
-  # vpc_offering      = var.vpc_offering
+
 }
 
 module "k8s_version" {
@@ -21,7 +21,7 @@ module "k8s_version" {
 
 
 module "kubernetes" {
-  depends_on = [module.k8s_version, module.network]
+  depends_on             = [module.k8s_version, module.network]
   source                 = "./modules/kubernetes-cluster"
   k8s_cluster_name       = var.k8s_cluster_name
   zone                   = var.zone

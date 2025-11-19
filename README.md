@@ -9,6 +9,25 @@ This project uses Terraform to automatically provision a complete Kubernetes env
 -   **Kubernetes Cluster:** Deploys a Kubernetes cluster, registering the required version and configuring the control-plane and worker nodes.
 -   **Modularity:** Organized into reusable Terraform modules (`network`, `kubernetes-cluster`, `kubernetes-version`).
 
+## Architecture
+
+```mermaid
+graph TD
+    subgraph CloudStack Zone
+        subgraph VPC["VPC (10.0.0.0/16)"]
+            subgraph Network["Guest Network (10.0.1.0/24)"]
+                K8sMaster["K8s Control Plane"]
+                K8sWorker1["K8s Worker 1"]
+                K8sWorker2["K8s Worker 2"]
+            end
+        end
+    end
+    
+    Internet((Internet)) -->|ACL| VPC
+    VPC -->|SourceNAT| Internet
+```
+
+
 ## Prerequisites
 
 -   [Terraform](https://www.terraform.io/downloads.html) (v1.0 or higher) installed.

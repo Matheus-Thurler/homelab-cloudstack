@@ -23,5 +23,5 @@ variable "vpc_offering_name" {
 }
 
 variable "network_offering_name" {
-  
+
 }

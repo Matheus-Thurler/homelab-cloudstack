@@ -29,10 +29,7 @@ variable "vpc_offering" {
   type        = string
 }
 
-# variable "vpc_offering_name" {
-#   description = "VPC offering to use for the VPC"
-#   type        = string
-# }
+
 
 variable "network_name" {
   description = "Name of the guest network"
