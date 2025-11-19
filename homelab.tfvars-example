@@ -1,0 +1,29 @@
+#GENERAL VARIABLES
+zone = "Homelab-Zone"
+api_url    = "http://<CLOUDSTACK_IP>:8080/client/api"
+api_key    = "<API_KEY>"
+secret_key = "<SECRET_KEY>"
+
+
+#NETWORK
+
+network_offering_name = "VPC Homelab K8s Network Offering"
+vpc_cidr          = "10.10.0.0/16"
+vpc_offering      = "Default VPC offering"
+vpc_name          = "vpc-homelab"
+network_name      = "homelab-k8s-network"
+network_cidr      = "10.10.1.0/24"
+
+
+#KUBERNETES
+
+k8s_semantic_version = "1.33.1"
+k8s_version_name     = "1.33.1"
+k8s_version_url      = "https://download.cloudstack.org/cks/setup-v1.33.1-calico-x86_64.iso"
+k8s_min_cpu          = 2
+k8s_min_memory       = 2048
+
+k8s_cluster_name       = "cluster-k8s-homelab"
+k8s_service_offering   = "K8s Instance"
+k8s_worker_nodes_size  = 2
+k8s_control_nodes_size = 3
