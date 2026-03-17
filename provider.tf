@@ -4,6 +4,10 @@ terraform {
       source  = "cloudstack/cloudstack"
       version = "~> 0.6.0"
     }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
+    }
   }
 }
 

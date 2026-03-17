@@ -1,0 +1,68 @@
+---
+# ─── CloudStack CCM — DaemonSet ───────────────────────────────────────────────
+# Roda o Cloud Controller Manager em todos os nós control-plane.
+# O CCM é responsável por:
+#   - Sincronizar estado dos nós com o CloudStack
+#   - Criar/destruir LoadBalancer rules no CloudStack quando um Service
+#     do tipo LoadBalancer é criado no Kubernetes
+#
+# Imagem: apache/cloudstack-kubernetes-provider (Apache CloudStack Kubernetes Provider)
+# Repo:   https://github.com/apache/cloudstack-kubernetes-provider
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cloudstack-cloud-controller-manager
+  namespace: kube-system
+  labels:
+    k8s-app: cloudstack-cloud-controller-manager
+spec:
+  selector:
+    matchLabels:
+      k8s-app: cloudstack-cloud-controller-manager
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: cloudstack-cloud-controller-manager
+    spec:
+      # Apenas no control-plane
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+        - key: node.cloudprovider.kubernetes.io/uninitialized
+          value: "true"
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      serviceAccountName: cloud-controller-manager
+      hostNetwork: true          # necessário para alcançar API do CloudStack
+      priorityClassName: system-cluster-critical
+      containers:
+        - name: cloudstack-cloud-controller-manager
+          image: apache/cloudstack-kubernetes-provider:latest
+          args:
+            - --cloud-config=/etc/cloudstack/cloud-config
+            - --leader-elect=true
+            - --use-service-account-credentials=true
+            - --controllers=cloud-node,cloud-node-lifecycle,service
+          volumeMounts:
+            - name: cloud-config
+              mountPath: /etc/cloudstack
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: cloud-config
+          secret:
+            secretName: cloudstack-secret
+            items:
+              - key: cloud-config
+                path: cloud-config

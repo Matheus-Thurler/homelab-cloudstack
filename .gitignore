@@ -36,3 +36,6 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# CloudStack CCM secret (contém credenciais da API)
+k8s/ccm/secret.yaml

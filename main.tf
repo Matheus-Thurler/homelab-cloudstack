@@ -1,33 +1,38 @@
-module "network" {
-  source                = "./modules/network"
-  zone                  = var.zone
-  vpc_cidr              = var.vpc_cidr
-  vpc_offering_name     = var.vpc_offering
-  vpc_name              = var.vpc_name
-  network_name          = var.network_name
-  network_cidr          = var.network_cidr
-  network_offering_name = var.network_offering_name
-
+# ─── VPC Network ─────────────────────────────────────────────────────────────
+module "vpc_network" {
+  source    = "./modules/vpc-network"
+  zone      = var.zone
+  vpc_name  = var.vpc_name
+  vpc_cidr  = var.vpc_cidr
+  tier_name = var.tier_name
+  tier_cidr = var.tier_cidr
 }
 
-module "k8s_version" {
-  source               = "./modules/kubernetes-version"
-  k8s_semantic_version = var.k8s_semantic_version
-  k8s_version_name     = var.k8s_version_name
-  k8s_version_url      = var.k8s_version_url
-  k8s_min_cpu          = var.k8s_min_cpu
-  k8s_min_memory       = var.k8s_min_memory
+# ─── Kubespray Cluster ────────────────────────────────────────────────────────
+module "kubespray" {
+  source = "./modules/kubespray-cluster"
+
+  zone         = var.zone
+  cluster_name = var.cluster_name
+
+  # Networking (from VPC module)
+  network_id    = module.vpc_network.network_id
+  ip_address_id = module.vpc_network.public_ip_id
+
+  # Nós do cluster (mapa com role, porta SSH e disco)
+  nodes            = var.nodes
+  service_offering = var.service_offering
+  template         = var.template
+  keypair_name     = var.keypair_name
+
+  depends_on = [module.vpc_network]
 }
 
-
-module "kubernetes" {
-  depends_on             = [module.k8s_version, module.network]
-  source                 = "./modules/kubernetes-cluster"
-  k8s_cluster_name       = var.k8s_cluster_name
-  zone                   = var.zone
-  k8s_service_offering   = var.k8s_service_offering
-  network_id             = module.network.network_id
-  k8s_control_nodes_size = var.k8s_control_nodes_size
-  k8s_worker_nodes_size  = var.k8s_worker_nodes_size
-  k8s_semantic_version   = module.k8s_version.kubernetes_version
+# ─── VMs Extras (opcional) ────────────────────────────────────────────────────
+module "extra_vms" {
+  count      = var.enable_extra_vms ? 1 : 0
+  source     = "./modules/vm"
+  zone       = var.zone
+  network_id = module.vpc_network.network_id
+  vms        = var.extra_vms
 }
